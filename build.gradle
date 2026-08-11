@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '4.0.5'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jvm-test-suite'
 }
 
 group = 'com.example'
@@ -69,4 +70,38 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// e2eTest: gerçek bir Postgres'e (Testcontainers, Docker gerektirir) karşı gerçek HTTP
+// istekleriyle tam kullanıcı akışlarını doğrular. test task'ından kasıtlı olarak ayrı —
+// lokal makinede Docker açık olmadan da ./gradlew build çalışabilsin diye. CI'da ayrı
+// bir adımda çalıştırılıyor (bkz. .github/workflows/ci.yml).
+testing {
+    suites {
+        e2eTest(JvmTestSuite) {
+            useJUnitJupiter()
+
+            dependencies {
+                implementation project()
+                implementation 'org.springframework.boot:spring-boot-starter-actuator-test'
+                implementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+                implementation 'org.springframework.boot:spring-boot-starter-security-test'
+                implementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+                implementation 'org.springframework.boot:spring-boot-testcontainers'
+                implementation 'org.testcontainers:junit-jupiter'
+                implementation 'org.testcontainers:postgresql'
+                implementation 'org.assertj:assertj-core'
+                implementation 'org.junit.jupiter:junit-jupiter'
+                runtimeOnly 'org.junit.platform:junit-platform-launcher'
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
 }

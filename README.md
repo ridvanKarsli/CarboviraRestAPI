@@ -75,6 +75,19 @@ Postgres/Docker gerekmiyor, `test` profili bellek içi H2 kullanıyor
 (`src/test/resources/application-test.properties`). Aynı build main'e her push/PR'da
 GitHub Actions'ta da çalışıyor (`.github/workflows/ci.yml`).
 
+Bunun dışında ayrı bir `e2eTest` task'ı var:
+
+```bash
+./gradlew e2eTest
+```
+
+Bu, servisleri mock'lamak yerine gerçek bir Postgres'e (Testcontainers ile ayağa kalkıyor,
+Docker gerektirir) karşı gerçek HTTP istekleriyle tüm akışı test ediyor: kayıt, giriş, ilan
+oluşturma/arama, mesajlaşma, admin onayı, yetkisiz erişim denemeleri
+(`src/e2eTest/java/.../e2e/CarboviraApiE2ETest.java`). `test`'ten kasıtlı olarak ayrı
+tuttum ki Docker açık değilken bile normal `./gradlew build` çalışsın. CI'da build'den
+sonra ayrı bir adımda otomatik çalışıyor, GitHub'ın runner'larında Docker zaten hazır geliyor.
+
 ## API
 
 ### Auth & Company
