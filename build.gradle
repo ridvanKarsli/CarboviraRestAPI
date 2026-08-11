@@ -22,6 +22,7 @@ repositories {
 ext {
     mapstructVersion = '1.6.3'
     jjwtVersion = '0.12.6'
+    testcontainersVersion = '2.0.5'
 }
 
 dependencies {
@@ -88,6 +89,9 @@ testing {
                 implementation 'org.springframework.boot:spring-boot-starter-security-test'
                 implementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
                 implementation 'org.springframework.boot:spring-boot-testcontainers'
+                // Spring'in kendi BOM'u testcontainers modüllerinin versiyonunu yönetmiyor,
+                // bu yüzden testcontainers'ın kendi BOM'unu ayrıca içe alıyoruz.
+                implementation platform("org.testcontainers:testcontainers-bom:${testcontainersVersion}")
                 implementation 'org.testcontainers:junit-jupiter'
                 implementation 'org.testcontainers:postgresql'
                 implementation 'org.assertj:assertj-core'
