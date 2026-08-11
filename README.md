@@ -39,6 +39,14 @@ eklemeye karar verdim.
 malzeme tipinin alanları farklı (nem oranı, saflık yüzdesi, parçacık boyutu...) — hepsine ayrı kolon
 açmak anlamsız olurdu. `specSheetUrl` de gerçek dosya yükleme değil, sadece bir link alanı.
 
+Etki raporundaki karbon rakamı (`common.CarbonEstimator`) kategori adında geçen birkaç anahtar
+kelimeye (metal, plastik, kağıt, cam, tekstil...) göre kaba bir kg CO2e/kg katsayısı uyguluyor,
+bilinmeyen kategoriler için sabit bir ortalama değer kullanıyor. Ölçülmüş bir veri değil, yayınlanmış
+ortalamalara dayanan bir tahmin — rapor öyle sunuluyor zaten. Satış tarafı kendi arşivlenen
+ilanlarımdan, alış tarafı benim başlattığım görüşmelerdeki karşı tarafın arşivlenen ilanlarından
+hesaplanıyor; `from`/`to` verilmezse tüm geçmiş, verilirse sadece o aralık (aylık, yıllık, ne
+istenirse) dikkate alınıyor.
+
 ## Klasör Yapısı
 
 ```
@@ -110,7 +118,8 @@ Auth & Company:
 - `GET /api/companies/me`, `PUT /api/companies/me` — kendi firma profilim (konum dahil)
 - `GET /api/companies/{id}` — başka firmanın genel profili
 - `GET /api/companies/me/impact-report` — toplam/aktif/arşiv ilan sayıları, birim bazlı toplam
-  miktar, toplam görüşme sayısı — sürdürülebilirlik raporlaması için kaba bir özet
+  miktar, toplam görüşme sayısı ve (opsiyonel `from`/`to` ile) o dönemde satılan/satın alınan
+  malzemeden önlenen tahmini karbon — sürdürülebilirlik raporlaması için kaba bir özet
 
 Listing:
 - `POST /api/listings` — yeni ilan, ACTIVE olarak başlar (opsiyonel `specSheetUrl` ve `attributes`)

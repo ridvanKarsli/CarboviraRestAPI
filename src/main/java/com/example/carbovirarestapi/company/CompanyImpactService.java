@@ -1,6 +1,7 @@
 package com.example.carbovirarestapi.company;
 
 import com.example.carbovirarestapi.company.dto.CompanyImpactReportResponse;
+import java.time.Instant;
 
 /**
  * CompanyService'ten ayrı tuttum çünkü onun işi profil CRUD, bu ise listing ve messaging
@@ -8,5 +9,6 @@ import com.example.carbovirarestapi.company.dto.CompanyImpactReportResponse;
  */
 public interface CompanyImpactService {
 
-    CompanyImpactReportResponse generate(Long companyId);
+    /** from/to null verilirse ilgili taraf sınırlanmaz, yani tüm geçmiş dikkate alınır. */
+    CompanyImpactReportResponse generate(Long companyId, Instant from, Instant to);
 }

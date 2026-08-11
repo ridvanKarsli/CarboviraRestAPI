@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -64,15 +66,20 @@ public class CompanyController {
     @Operation(
             summary = "Kendi firmamın etki raporu",
             description = "Toplam/aktif/arşiv ilan sayıları, birim bazlı toplam miktar ve toplam görüşme sayısını döner. "
-                    + "Sürdürülebilirlik raporlaması için kaba bir özet, kesin bir CO2 hesabı değil."
+                    + "from/to verilirse (opsiyonel, ör. aylık ya da yıllık dönem) o aralıkta satılan ve satın alınan "
+                    + "malzemeden önlenen tahmini karbon da hesaba eklenir. Sürdürülebilirlik raporlaması için kaba "
+                    + "bir özet, kesin bir CO2 hesabı değil."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Etki raporu"),
             @ApiResponse(responseCode = "401", description = "Token eksik/geçersiz",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class)))
     })
-    public CompanyImpactReportResponse getImpactReport(@AuthenticationPrincipal UserPrincipal principal) {
-        return companyImpactService.generate(principal.getCompanyId());
+    public CompanyImpactReportResponse getImpactReport(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Parameter(description = "Dönem başlangıcı, verilmezse tüm geçmiş dikkate alınır") @RequestParam(required = false) Instant from,
+            @Parameter(description = "Dönem bitişi, verilmezse tüm geçmiş dikkate alınır") @RequestParam(required = false) Instant to) {
+        return companyImpactService.generate(principal.getCompanyId(), from, to);
     }
 
     @GetMapping("/{id}")

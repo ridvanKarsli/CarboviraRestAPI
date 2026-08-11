@@ -312,6 +312,8 @@ class CarboviraApiE2ETest {
         // O ana kadar seller iki ilan açmıştı (biri arşivlenmiş, biri aktif) ve bir görüşmeye taraftı.
         assertThat(response.getBody().totalListings()).isGreaterThanOrEqualTo(2);
         assertThat(response.getBody().totalConversations()).isGreaterThanOrEqualTo(1);
+        // from/to verilmediğinde tüm geçmiş dikkate alınıyor, karbon alanları null olmamalı.
+        assertThat(response.getBody().co2SavedKgTotal()).isNotNull();
     }
 
     private HttpEntity<Object> authedEntity(String token, Object body) {
