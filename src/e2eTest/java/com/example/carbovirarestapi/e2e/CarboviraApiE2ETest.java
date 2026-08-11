@@ -23,6 +23,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.resttestclient.AutoConfigureTestRestTemplate;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.core.ParameterizedTypeReference;
@@ -50,6 +51,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+// Boot 4'te TestRestTemplate artik otomatik bean olarak eklenmiyor, ayrica bu annotation lazim.
+@AutoConfigureTestRestTemplate
 @TestPropertySource(properties = {
         "app.admin.email=e2e-admin@carbovira.com",
         "app.admin.password=e2e-admin-sifresi-123"
