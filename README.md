@@ -1,9 +1,10 @@
-# Carbovira — Endüstriyel Simbiyoz Platformu
+# Carbovira
 
 ![CI](https://github.com/ridvanKarsli/CarboviraRestAPI/actions/workflows/ci.yml/badge.svg)
 
 Firmaların atıklarını başka bir firmanın hammaddesi olarak ilan edebildiği, arayabildiği ve
-platform üzerinden iletişime geçebildiği bir REST API.
+platform üzerinden iletişime geçebildiği bir REST API. Endüstriyel simbiyoz fikrini
+dijitalleştirmeye çalışıyorum.
 
 ## Notlar
 
@@ -90,60 +91,39 @@ sonra ayrı bir adımda otomatik çalışıyor, GitHub'ın runner'larında Docke
 
 ## API
 
-### Auth & Company
+Aşağıdakilerin hepsi `Authorization: Bearer <token>` ister, tek istisna `/api/auth/**`.
+Detaylı örnekler için Swagger daha rahat: http://localhost:8080/swagger-ui.html
 
-| Metot | Yol | Açıklama | Yetki |
-|---|---|---|---|
-| POST | `/api/auth/register` | Firma + ilk kullanıcı (COMPANY_ADMIN) kaydı | herkese açık |
-| POST | `/api/auth/login` | JWT token üretimi | herkese açık |
-| GET | `/api/companies/me` | Giriş yapan kullanıcının firma profili | JWT gerekli |
-| PUT | `/api/companies/me` | Firma profilini güncelle | JWT gerekli |
-| GET | `/api/companies/{id}` | Herkese açık firma profili | JWT gerekli |
+Auth & Company:
+- `POST /api/auth/register` — firma + ilk kullanıcıyı (COMPANY_ADMIN) birlikte oluşturur, herkese açık
+- `POST /api/auth/login` — herkese açık
+- `GET /api/companies/me`, `PUT /api/companies/me` — kendi firma profilim
+- `GET /api/companies/{id}` — başka firmanın genel profili
 
-### Listing
+Listing:
+- `POST /api/listings` — yeni ilan, ACTIVE olarak başlar
+- `GET /api/listings` — sadece ACTIVE ilanlarda arama (`type`, `category`, `city`, `q`, sayfalama)
+- `GET /api/listings/mine` — kendi firmamın tüm ilanları, durum fark etmeksizin
+- `GET /api/listings/{id}`
+- `PUT /api/listings/{id}`, `PATCH /api/listings/{id}/status`, `DELETE /api/listings/{id}` — sadece ilan sahibi
 
-| Metot | Yol | Açıklama | Yetki |
-|---|---|---|---|
-| POST | `/api/listings` | Yeni atık/hammadde ilanı (ACTIVE başlar) | JWT gerekli |
-| GET | `/api/listings` | ACTIVE ilanlarda ara (`type`, `category`, `city`, `q`, sayfalama) | JWT gerekli |
-| GET | `/api/listings/mine` | Kendi firmamın tüm ilanları (durum fark etmez) | JWT gerekli |
-| GET | `/api/listings/{id}` | İlan detayı | JWT gerekli |
-| PUT | `/api/listings/{id}` | İlanı güncelle (sadece sahibi) | JWT gerekli |
-| PATCH | `/api/listings/{id}/status` | Durum değiştir: ACTIVE/PASSIVE/ARCHIVED (sadece sahibi) | JWT gerekli |
-| DELETE | `/api/listings/{id}` | İlanı sil (sadece sahibi) | JWT gerekli |
+Messaging:
+- `POST /api/conversations` — ilan hakkında görüşme başlatır ya da varsa mevcut görüşmeye mesaj ekler
+- `GET /api/conversations` — taraf olduğum görüşmeler
+- `GET /api/conversations/{id}/messages`, `POST /api/conversations/{id}/messages` — sadece taraflar
 
-### Messaging
+Kendi ilanına mesaj gönderemezsin (400). Taraf olmadığın görüşmeye erişim 403.
 
-| Metot | Yol | Açıklama | Yetki |
-|---|---|---|---|
-| POST | `/api/conversations` | İlan hakkında görüşme başlat/devam ettir | JWT gerekli |
-| GET | `/api/conversations` | Taraf olduğum tüm görüşmeler | JWT gerekli |
-| GET | `/api/conversations/{id}/messages` | Görüşmedeki mesajlar (sadece taraflar) | JWT gerekli |
-| POST | `/api/conversations/{id}/messages` | Görüşmeye mesaj gönder (sadece taraflar) | JWT gerekli |
+Admin (sadece PLATFORM_ADMIN):
+- `GET /api/admin/companies` — `verified` filtresi opsiyonel
+- `PATCH /api/admin/companies/{id}/verify`
 
-Kendi ilanına mesaj gönderemezsin (`400`). Aynı firma aynı ilana ikinci görüşme açamaz, tekrar mesaj
-atınca mevcut görüşmeye eklenir. Taraf olmadığın bir görüşmeye erişim `403` döner.
-
-### Admin
-
-| Metot | Yol | Açıklama | Yetki |
-|---|---|---|---|
-| GET | `/api/admin/companies` | Firmaları listele (`verified` filtresiyle, ops.) | PLATFORM_ADMIN |
-| PATCH | `/api/admin/companies/{id}/verify` | Firmayı onayla | PLATFORM_ADMIN |
-
-Onay şu an sadece bilgilendirici bir rozet — onaylanmamış firmalar da ilan verip mesajlaşabiliyor,
-`verified=false` sadece `CompanyResponse`'ta görünüyor. İleride zorunlu yapmak istersek
-`ListingService.create()`'e tek bir kontrol eklemek yeterli.
-
-İlk platform yöneticisi register'dan oluşmuyor (register her zaman COMPANY_ADMIN üretiyor).
-`ADMIN_EMAIL`/`ADMIN_PASSWORD` tanımlıysa açılışta otomatik oluşuyor (`admin.AdminBootstrapRunner`).
-
----
-
-Tüm istekler (auth uçları hariç) `Authorization: Bearer <token>` başlığı bekler. Başka bir firmanın
-ilanında/görüşmesinde güncelleme/silme denemesi `403 Forbidden` döner.
+Onay şu an sadece bilgilendirici bir rozet, onaylanmamış firmalar da ilan verip mesajlaşabiliyor.
+İleride zorunlu yapmak istersem `ListingService.create()`'e tek bir kontrol eklemek yeterli olur.
+İlk platform yöneticisi register'dan gelmiyor, `ADMIN_EMAIL`/`ADMIN_PASSWORD` tanımlıysa açılışta
+otomatik oluşuyor (`admin.AdminBootstrapRunner`).
 
 ## Sırada ne var
 
-Bildirimler, ilan/firma için görsel yükleme, ilan onayının zorunlu hale getirilmesi gibi fikirler
-`Carbovira_Proje_Raporu.docx` içinde duruyor — henüz yapılmadı.
+Bildirimler, ilan/firma için görsel yükleme, ilan onayının zorunlu hale getirilmesi — şimdilik
+fikir aşamasında, vaktim olunca bakacağım.
