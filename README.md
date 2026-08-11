@@ -5,13 +5,19 @@ platform üzerinden iletişime geçebildiği bir REST API.
 
 ## Mimari İlkeler
 
-- **Feature-based (özellik bazlı) paket yapısı**: `auth`, `company`, `listing`, `user`, `security`, `common`, `config`.
-  Her modül kendi controller / service (arayüz + impl) / repository / dto katmanını bir arada barındırır.
-  İlerleyen fazda eklenecek `messaging` modülü de aynı şablonu izleyecek.
+- **Feature-based (özellik bazlı) paket yapısı**: `auth`, `company`, `listing`, `messaging`, `user`, `security`,
+  `common`, `config`. Her modül kendi controller / service (arayüz + impl) / repository / dto katmanını bir
+  arada barındırır.
 - **Dinamik arama filtreleri Specification (Criteria API) ile**: `listing.ListingSpecifications`, tip/kategori/
   şehir/anahtar kelime gibi hepsi opsiyonel filtreleri tek sorguda birleştirir; her kombinasyon için ayrı
   repository metodu yazmaya gerek kalmaz. Gerçek bir veritabanına karşı `ListingRepositorySpecificationTest`
-  (`@DataJpaTest` + H2) ile doğrulanır.
+  ile doğrulanır. Büyük/küçük harf duyarsız karşılaştırmalarda Türkçe "İ/I" karakterlerinin Java ile SQL
+  arasında farklı sonuç üretmesine ("Türkçe I problemi") karşı, karşılaştırmanın iki tarafı da aynı SQL
+  `LOWER()` fonksiyonundan geçirilir.
+- **Mesajlaşma "get-or-create" deseniyle**: Aynı firma aynı ilan için ikinci bir görüşme açamaz — hem
+  `ConversationServiceImpl` hem de veritabanı seviyesinde (`UNIQUE (listing_id, initiator_company_id)`)
+  garanti edilir. Görüşme yanıtındaki "karşı taraf", her kullanıcı için o kullanıcının bakış açısına göre
+  hesaplanır.
 - **SOLID**:
   - *SRP*: Controller sadece HTTP çevirisi yapar, iş kuralı Service'te, veri erişimi Repository'de, hata
     haritalama tek noktada `GlobalExceptionHandler`'da toplanır.
@@ -33,7 +39,8 @@ com.example.carbovirarestapi
 ├── user       # User entity, Role enum, UserRepository
 ├── company    # Company entity, DTO, Mapper, Service, Controller
 ├── auth       # Kayıt/giriş DTO'ları, AuthService, AuthController
-└── listing    # Listing entity, Specification, DTO, Mapper, Service, Controller
+├── listing    # Listing entity, Specification, DTO, Mapper, Service, Controller
+└── messaging  # Conversation/Message entity, DTO, Mapper, Service, Controller
 ```
 
 ## Yerel Geliştirme
@@ -90,10 +97,23 @@ Testler gerçek bir Postgres/Docker gerektirmez; `test` profili bellek içi H2 k
 | PATCH | `/api/listings/{id}/status` | Durumu değiştir: ACTIVE/PASSIVE/ARCHIVED (sadece sahibi) | JWT gerekli |
 | DELETE | `/api/listings/{id}` | İlanı sil (sadece sahibi) | JWT gerekli |
 
+### Faz 3 — Messaging (Görüşme)
+
+| Metot | Yol | Açıklama | Yetki |
+|---|---|---|---|
+| POST | `/api/conversations` | İlan hakkında görüşme başlat/devam ettir (ilk/yeni mesajla birlikte) | JWT gerekli |
+| GET | `/api/conversations` | Taraf olduğum tüm görüşmeler | JWT gerekli |
+| GET | `/api/conversations/{id}/messages` | Görüşmedeki mesajlar (sadece taraflar) | JWT gerekli |
+| POST | `/api/conversations/{id}/messages` | Görüşmeye mesaj gönder (sadece taraflar) | JWT gerekli |
+
+Kendi ilanınıza mesaj gönderemezsiniz (`400`). Aynı firma aynı ilan için ikinci bir görüşme açamaz;
+tekrar mesaj gönderildiğinde mevcut görüşmeye eklenir. Taraf olmadığınız bir görüşmeye erişim `403` döner.
+
 Tüm istekler (auth uçları hariç) `Authorization: Bearer <token>` başlığı bekler. Başka bir firmanın
 ilanında güncelleme/silme denemesi `403 Forbidden` ile sonuçlanır.
 
 ## Yol Haritası
 
-Sıradaki faz `messaging` (firmalar arası ilan üzerinden yazışma) — proje raporunda
-(`Carbovira_Proje_Raporu.docx`) detaylandırılmıştır ve aynı feature-based mimariyi izleyecektir.
+Faz 1 (Auth & Company), Faz 2 (Listing) ve Faz 3 (Messaging) tamamlandı. Sonraki olası adımlar: admin
+onay akışı, bildirimler, ilan/firma için dosya-görsel yükleme — proje raporunda (`Carbovira_Proje_Raporu.docx`)
+detaylandırılmıştır.

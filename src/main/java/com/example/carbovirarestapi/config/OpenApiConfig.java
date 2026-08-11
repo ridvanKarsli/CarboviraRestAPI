@@ -37,7 +37,8 @@ public class OpenApiConfig {
                 .tags(List.of(
                         new Tag().name("Auth").description("Firma + kullanıcı kaydı ve giriş işlemleri"),
                         new Tag().name("Company").description("Firma profili işlemleri"),
-                        new Tag().name("Listing").description("Atık/hammadde ilanları")
+                        new Tag().name("Listing").description("Atık/hammadde ilanları"),
+                        new Tag().name("Messaging").description("İlan üzerinden firmalar arası görüşme ve mesajlaşma")
                 ))
                 .addSecurityItem(new SecurityRequirement().addList(BEARER_SCHEME_NAME))
                 .components(new Components()
