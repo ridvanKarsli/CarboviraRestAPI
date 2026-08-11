@@ -23,7 +23,10 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
 
     public RestAuthenticationEntryPoint(ObjectProvider<ObjectMapper> objectMapperProvider) {
-        this.objectMapper = objectMapperProvider.getIfAvailable(ObjectMapper::new);
+        // findAndRegisterModules olmadan cıplak ObjectMapper, Instant gibi java.time tiplerini
+        // serialize edemiyor (jackson-datatype-jsr310 module'u yüklenmemiş oluyor) — bunu farkına
+        // varmadan önce ApiError.timestamp burada patlatıyordu.
+        this.objectMapper = objectMapperProvider.getIfAvailable(() -> new ObjectMapper().findAndRegisterModules());
     }
 
     @Override

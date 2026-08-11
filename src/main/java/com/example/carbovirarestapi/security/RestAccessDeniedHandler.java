@@ -25,7 +25,9 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
     private final ObjectMapper objectMapper;
 
     public RestAccessDeniedHandler(ObjectProvider<ObjectMapper> objectMapperProvider) {
-        this.objectMapper = objectMapperProvider.getIfAvailable(ObjectMapper::new);
+        // Aynı sebeple RestAuthenticationEntryPoint'teki gibi: cıplak ObjectMapper Instant'ı
+        // serialize edemiyor, findAndRegisterModules ile jsr310 modülünü de yükletiyoruz.
+        this.objectMapper = objectMapperProvider.getIfAvailable(() -> new ObjectMapper().findAndRegisterModules());
     }
 
     @Override
