@@ -1,0 +1,27 @@
+package com.example.carbovirarestapi.listing;
+
+import com.example.carbovirarestapi.listing.dto.ListingCreateRequest;
+import com.example.carbovirarestapi.listing.dto.ListingResponse;
+import com.example.carbovirarestapi.listing.dto.ListingUpdateRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+/** İlan iş kurallarının sözleşmesi (DIP): controller somut implementasyonu bilmez. */
+public interface ListingService {
+
+    ListingResponse create(Long companyId, ListingCreateRequest request);
+
+    ListingResponse getById(Long listingId);
+
+    /** Sadece ACTIVE ilanlar arasında, verilen (opsiyonel) filtrelerle arama yapar. */
+    Page<ListingResponse> search(ListingType type, String category, String city, String keyword, Pageable pageable);
+
+    /** Çağıran firmanın durumu ne olursa olsun tüm kendi ilanları. */
+    Page<ListingResponse> getMine(Long companyId, Pageable pageable);
+
+    ListingResponse update(Long companyId, Long listingId, ListingUpdateRequest request);
+
+    ListingResponse updateStatus(Long companyId, Long listingId, ListingStatus status);
+
+    void delete(Long companyId, Long listingId);
+}

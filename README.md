@@ -5,9 +5,13 @@ platform üzerinden iletişime geçebildiği bir REST API.
 
 ## Mimari İlkeler
 
-- **Feature-based (özellik bazlı) paket yapısı**: `auth`, `company`, `user`, `security`, `common`, `config`.
+- **Feature-based (özellik bazlı) paket yapısı**: `auth`, `company`, `listing`, `user`, `security`, `common`, `config`.
   Her modül kendi controller / service (arayüz + impl) / repository / dto katmanını bir arada barındırır.
-  İlerleyen fazlarda eklenecek `listing` ve `messaging` modülleri de aynı şablonu izleyecek.
+  İlerleyen fazda eklenecek `messaging` modülü de aynı şablonu izleyecek.
+- **Dinamik arama filtreleri Specification (Criteria API) ile**: `listing.ListingSpecifications`, tip/kategori/
+  şehir/anahtar kelime gibi hepsi opsiyonel filtreleri tek sorguda birleştirir; her kombinasyon için ayrı
+  repository metodu yazmaya gerek kalmaz. Gerçek bir veritabanına karşı `ListingRepositorySpecificationTest`
+  (`@DataJpaTest` + H2) ile doğrulanır.
 - **SOLID**:
   - *SRP*: Controller sadece HTTP çevirisi yapar, iş kuralı Service'te, veri erişimi Repository'de, hata
     haritalama tek noktada `GlobalExceptionHandler`'da toplanır.
@@ -28,7 +32,8 @@ com.example.carbovirarestapi
 ├── security   # JWT üretimi/doğrulaması, SecurityConfig, UserPrincipal
 ├── user       # User entity, Role enum, UserRepository
 ├── company    # Company entity, DTO, Mapper, Service, Controller
-└── auth       # Kayıt/giriş DTO'ları, AuthService, AuthController
+├── auth       # Kayıt/giriş DTO'ları, AuthService, AuthController
+└── listing    # Listing entity, Specification, DTO, Mapper, Service, Controller
 ```
 
 ## Yerel Geliştirme
@@ -61,7 +66,9 @@ com.example.carbovirarestapi
 Testler gerçek bir Postgres/Docker gerektirmez; `test` profili bellek içi H2 kullanır
 (`src/test/resources/application-test.properties`).
 
-## API Uç Noktaları (Faz 1)
+## API Uç Noktaları
+
+### Faz 1 — Auth & Company
 
 | Metot | Yol | Açıklama | Yetki |
 |---|---|---|---|
@@ -71,9 +78,22 @@ Testler gerçek bir Postgres/Docker gerektirmez; `test` profili bellek içi H2 k
 | PUT | `/api/companies/me` | Firma profilini güncelle | JWT gerekli |
 | GET | `/api/companies/{id}` | Herkese açık firma profili | JWT gerekli |
 
-Tüm istekler (auth uçları hariç) `Authorization: Bearer <token>` başlığı bekler.
+### Faz 2 — Listing (İlan)
+
+| Metot | Yol | Açıklama | Yetki |
+|---|---|---|---|
+| POST | `/api/listings` | Yeni atık/hammadde ilanı oluştur (ACTIVE başlar) | JWT gerekli |
+| GET | `/api/listings` | ACTIVE ilanlarda ara (`type`, `category`, `city`, `q`, sayfalama) | JWT gerekli |
+| GET | `/api/listings/mine` | Kendi firmamın tüm ilanları (durum fark etmez) | JWT gerekli |
+| GET | `/api/listings/{id}` | İlan detayı | JWT gerekli |
+| PUT | `/api/listings/{id}` | İlanı güncelle (sadece sahibi) | JWT gerekli |
+| PATCH | `/api/listings/{id}/status` | Durumu değiştir: ACTIVE/PASSIVE/ARCHIVED (sadece sahibi) | JWT gerekli |
+| DELETE | `/api/listings/{id}` | İlanı sil (sadece sahibi) | JWT gerekli |
+
+Tüm istekler (auth uçları hariç) `Authorization: Bearer <token>` başlığı bekler. Başka bir firmanın
+ilanında güncelleme/silme denemesi `403 Forbidden` ile sonuçlanır.
 
 ## Yol Haritası
 
-Sonraki fazlar (`listing`, arama/filtreleme, `messaging`, admin onay akışı) proje raporunda
+Sıradaki faz `messaging` (firmalar arası ilan üzerinden yazışma) — proje raporunda
 (`Carbovira_Proje_Raporu.docx`) detaylandırılmıştır ve aynı feature-based mimariyi izleyecektir.

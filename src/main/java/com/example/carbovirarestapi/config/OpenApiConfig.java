@@ -36,7 +36,8 @@ public class OpenApiConfig {
                                 .email("rdvn35050@gmail.com")))
                 .tags(List.of(
                         new Tag().name("Auth").description("Firma + kullanıcı kaydı ve giriş işlemleri"),
-                        new Tag().name("Company").description("Firma profili işlemleri")
+                        new Tag().name("Company").description("Firma profili işlemleri"),
+                        new Tag().name("Listing").description("Atık/hammadde ilanları")
                 ))
                 .addSecurityItem(new SecurityRequirement().addList(BEARER_SCHEME_NAME))
                 .components(new Components()
