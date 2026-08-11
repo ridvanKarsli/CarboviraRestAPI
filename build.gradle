@@ -88,6 +88,9 @@ testing {
                 implementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
                 implementation 'org.springframework.boot:spring-boot-starter-security-test'
                 implementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+                // TestRestTemplate Boot 4'te ayrı bir modüle taşınmış (eski org.springframework.boot.test.web.client
+                // paketi artık yok) — jar'ı ~/.gradle cache'inde grep'leyip bulduk.
+                implementation 'org.springframework.boot:spring-boot-resttestclient'
                 implementation 'org.springframework.boot:spring-boot-testcontainers'
                 // io.spring.dependency-management versiyonsuz bağımlılıkları illa kendi BOM'undan
                 // yönetmeye çalışıyor ve testcontainers-bom platform importunu görmezden geliyor —
