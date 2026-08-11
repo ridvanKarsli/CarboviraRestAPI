@@ -80,14 +80,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private AuthResponse toAuthResponse(String token, User user, Company company) {
+        // PLATFORM_ADMIN'in firması olmadığından company burada null gelebilir.
+        Long companyId = company != null ? company.getId() : null;
+        String companyName = company != null ? company.getName() : null;
         return new AuthResponse(
                 token,
                 user.getId(),
                 user.getEmail(),
                 user.getFullName(),
                 user.getRole(),
-                company.getId(),
-                company.getName()
+                companyId,
+                companyName
         );
     }
 }

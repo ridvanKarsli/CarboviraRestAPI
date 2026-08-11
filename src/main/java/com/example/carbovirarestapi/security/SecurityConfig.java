@@ -36,6 +36,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
     private final UserDetailsService userDetailsService;
 
     @Bean
@@ -67,7 +68,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("PLATFORM_ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(restAuthenticationEntryPoint)
+                        .accessDeniedHandler(restAccessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
