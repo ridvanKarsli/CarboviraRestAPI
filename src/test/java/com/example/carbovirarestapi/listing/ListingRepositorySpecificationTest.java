@@ -15,14 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * ListingSpecifications'ın gerçek bir veritabanına (H2) karşı doğru filtrelediğini
- * doğrular. Criteria API gibi derleme zamanında tip güvenliği sınırlı olan kodlar
- * için gerçek bir sorgu çalıştırmak, salt unit test'ten daha güvenilir bir doğrulamadır.
- * <p>
- * Not: Dar kapsamlı @DataJpaTest yerine tam context (@SpringBootTest) kullanılır —
- * bu proje ortamında test-slice autoconfigure paketlerinin konumu (Boot 4 modülerleşmesiyle)
- * belirsiz olduğundan, zaten çalıştığı doğrulanmış olan tam context kurulumu tercih edildi.
- * Her test @Transactional sayesinde çalıştıktan sonra otomatik geri alınır (rollback).
+ * ListingSpecifications'ı gerçek bir veritabanına (H2) karşı çalıştırıp filtrelerin
+ * doğru çalıştığını doğrular. @DataJpaTest yerine @SpringBootTest kullanıyorum çünkü bu
+ * Boot sürümünde @DataJpaTest'in paketi taşınmış görünüyor; @Transactional ile her test sonrası rollback oluyor.
  */
 @SpringBootTest
 @ActiveProfiles("test")

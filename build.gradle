@@ -29,8 +29,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-    // spring-boot-starter-webmvc JSON (Jackson) desteğini kendiliğinden getirmiyor;
-    // ObjectMapper autoconfigürasyonu ve REST yanıtlarının JSON serileştirmesi için gerekli.
+    // webmvc starter Jackson'ı otomatik getirmiyor, ObjectMapper bean'i olmadan context patlıyordu
     implementation 'org.springframework.boot:spring-boot-starter-json'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
 

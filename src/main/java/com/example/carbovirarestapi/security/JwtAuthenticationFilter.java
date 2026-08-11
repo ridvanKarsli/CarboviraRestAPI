@@ -17,9 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Her istekte Authorization başlığındaki Bearer token'ı okuyup doğrular ve
- * geçerliyse SecurityContext'e kimliği yerleştirir. Token yoksa/geçersizse
- * isteği engellemez; yetkilendirme kararını SecurityConfig'deki kurallar verir.
+ * Her istekte Authorization başlığındaki Bearer token'ı okur, geçerliyse SecurityContext'e
+ * kimliği yerleştirir. Token yoksa/geçersizse isteği engellemez, karar SecurityConfig'de verilir.
  */
 @Slf4j
 @Component

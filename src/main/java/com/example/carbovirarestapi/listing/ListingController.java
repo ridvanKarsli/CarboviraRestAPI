@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller yalnızca HTTP <-> servis çevirisi yapar; iş kuralları ve sahiplik kontrolü ListingService içindedir (SRP). */
 @RestController
 @RequestMapping("/api/listings")
 @RequiredArgsConstructor

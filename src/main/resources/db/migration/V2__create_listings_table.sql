@@ -14,7 +14,6 @@ CREATE TABLE listings (
     updated_at   TIMESTAMP     NOT NULL DEFAULT now()
 );
 
--- Arama uçlarındaki filtrelerle birebir eşleşen bileşik index: durum her sorguda
--- sabit olduğundan (ACTIVE) en solda, ardından en sık kullanılan tip/şehir filtreleri.
+-- status her aramada sabit (ACTIVE) oldugu icin index'te en solda
 CREATE INDEX idx_listings_status_type_city ON listings (status, type, city);
 CREATE INDEX idx_listings_company_id ON listings (company_id);

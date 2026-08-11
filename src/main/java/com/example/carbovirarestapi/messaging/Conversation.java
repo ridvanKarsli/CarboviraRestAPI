@@ -16,8 +16,7 @@ import lombok.Setter;
 
 /**
  * Bir ilan üzerinden, ilan sahibi olmayan bir firmanın (initiator) başlattığı görüşme.
- * Görüşmenin diğer tarafı her zaman {@code listing.getCompany()}'dir — ayrıca alan
- * olarak tutulmaz (tek doğruluk kaynağı, veri tekrarı yok).
+ * Diğer taraf ayrıca bir alan olarak tutulmuyor, her zaman listing.getCompany() üzerinden okunuyor.
  */
 @Entity
 @Table(name = "conversations")

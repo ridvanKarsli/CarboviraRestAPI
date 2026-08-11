@@ -6,7 +6,7 @@ import com.example.carbovirarestapi.listing.dto.ListingUpdateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-/** İlan iş kurallarının sözleşmesi (DIP): controller somut implementasyonu bilmez. */
+/** İlan (atık/hammadde) işlemleri. */
 public interface ListingService {
 
     ListingResponse create(Long companyId, ListingCreateRequest request);

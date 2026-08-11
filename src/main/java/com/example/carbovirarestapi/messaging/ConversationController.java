@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller yalnızca HTTP <-> servis çevirisi yapar; iş kuralları ve sahiplik kontrolü ConversationService içindedir (SRP). */
 @RestController
 @RequestMapping("/api/conversations")
 @RequiredArgsConstructor

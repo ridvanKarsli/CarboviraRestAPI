@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Controller yalnızca HTTP <-> servis çevirisi yapar; iş kuralları CompanyService içindedir (SRP). */
 @RestController
 @RequestMapping("/api/companies")
 @RequiredArgsConstructor

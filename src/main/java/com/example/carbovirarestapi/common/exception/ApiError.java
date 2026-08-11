@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.List;
 
-/**
- * Tüm hata yanıtları için tek tip (standart) gövde.
- * İstemcinin her endpoint için farklı hata formatı bekleme zorunluluğunu ortadan kaldırır.
- */
+/** Tüm hata yanıtlarında kullanılan ortak gövde. */
 @Schema(description = "Standart hata yanıtı gövdesi")
 public record ApiError(
 

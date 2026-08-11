@@ -14,13 +14,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 /**
- * Kimliksiz/geçersiz erişim denemelerinde de GlobalExceptionHandler ile aynı ApiError formatını döner.
- * <p>
- * Bu güvenlik katmanı bileşeni, uygulamanın tam Jackson auto-configuration'ına
- * (ör. spring.jackson.* özelleştirmeleri) bağımlı olmak zorunda değildir; bu yüzden
- * Spring context'te bir {@link ObjectMapper} bean'i varsa onu kullanır, yoksa
- * kendi minimal örneğini oluşturur. Böylece güvenlik filtresi, uygulamanın geri
- * kalanındaki JSON yapılandırmasından bağımsız olarak her koşulda ayağa kalkar.
+ * Kimliksiz/geçersiz erişim denemelerinde GlobalExceptionHandler ile aynı ApiError formatını döner.
+ * ObjectMapper bean'i context'te yoksa (bazı test slice'larında olmayabiliyor) kendi örneğini kurar.
  */
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {

@@ -7,14 +7,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 /**
- * İlan aramasındaki filtrelerin (hepsi opsiyonel) tek bir sorguda birleştirilmesinden
- * sorumludur. Servis katmanının JPA Criteria API detaylarını bilmesine gerek kalmaz (SRP).
+ * İlan arama filtrelerini (hepsi opsiyonel) tek sorguda birleştirir.
  * <p>
- * Büyük/küçük harf duyarsız karşılaştırmalarda, Türkçe "İ/I" gibi karakterlerin Java
- * tarafındaki {@code String.toLowerCase(Locale)} ile veritabanının {@code LOWER()} SQL
- * fonksiyonu arasında farklı sonuç üretebilmesi ("Türkçe I problemi") riskine karşı,
- * karşılaştırmanın HER İKİ tarafı da bilerek aynı {@code cb.lower(...)} (SQL LOWER())
- * üzerinden geçirilir; Java tarafında ayrıca String.toLowerCase() çağrılmaz.
+ * Not: category/city/keyword karşılaştırmalarında Java'da toLowerCase() çağırmıyoruz,
+ * her iki tarafı da cb.lower() ile SQL LOWER()'a bırakıyoruz. "İstanbul" gibi büyük
+ * noktalı İ içeren değerlerde Java'nın Locale.ROOT.toLowerCase() sonucu (i̇) ile veritabanının
+ * LOWER() sonucu (i) farklı çıkıp eşleşme kaçırıyordu — bunu yaşayınca böyle düzelttim.
  */
 public final class ListingSpecifications {
 

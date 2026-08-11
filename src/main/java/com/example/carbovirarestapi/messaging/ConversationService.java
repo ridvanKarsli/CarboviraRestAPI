@@ -7,7 +7,7 @@ import com.example.carbovirarestapi.messaging.dto.MessageSendRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-/** Görüşme ve mesajlaşma iş kurallarının sözleşmesi (DIP). */
+/** Görüşme ve mesajlaşma işlemleri. */
 public interface ConversationService {
 
     /** Aynı firma + ilan için görüşme zaten varsa onu kullanır, yoksa yenisini açar; her durumda ilk/yeni mesajı ekler. */

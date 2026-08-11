@@ -13,12 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 /**
- * Uygulama her başladığında çalışır; {@code ADMIN_EMAIL}/{@code ADMIN_PASSWORD} ortam
- * değişkenleri tanımlıysa ve bu e-postaya sahip bir kullanıcı yoksa ilk PLATFORM_ADMIN
- * kullanıcısını otomatik oluşturur. İdempotenttir — kullanıcı zaten varsa hiçbir şey yapmaz.
- * <p>
- * Register uç noktası her zaman COMPANY_ADMIN oluşturduğundan, platform yöneticisini
- * oluşturmanın başka bir yolu yoktur; bu yüzden bootstrap ortam değişkeni ile yapılır.
+ * ADMIN_EMAIL/ADMIN_PASSWORD tanımlıysa ve bu e-postayla kullanıcı yoksa, açılışta ilk
+ * PLATFORM_ADMIN'i oluşturur. Register uç noktası her zaman COMPANY_ADMIN ürettiği için
+ * platform yöneticisini oluşturmanın başka yolu yok.
  */
 @Slf4j
 @Component

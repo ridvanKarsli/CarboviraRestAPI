@@ -22,11 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Sadece PLATFORM_ADMIN rolündeki kullanıcılar erişebilir. Onay, firmaların ilan
- * verme/mesajlaşma yeteneğini engellemez (MVP kararı: "sadece rozet") — verified alanı
- * sadece bilgilendirme amaçlıdır, diğer modüllerde bir zorunluluk kontrolü yapılmaz.
- */
+/** Onay şu an için sadece bilgilendirme amaçlı; verified=false firmaların ilan vermesini engellemiyor. */
 @RestController
 @RequestMapping("/api/admin/companies")
 @RequiredArgsConstructor

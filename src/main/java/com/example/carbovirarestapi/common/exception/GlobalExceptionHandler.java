@@ -11,11 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Uygulama genelindeki tüm istisnaları tek noktadan yakalayıp tutarlı bir
- * {@link ApiError} gövdesine çevirir. Controller'ların try/catch ile
- * kirlenmesini önler (SRP: hata haritalama sorumluluğu tek yerde toplanır).
- */
+/** Tüm istisnaları tek noktadan yakalayıp {@link ApiError} formatına çevirir. */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {

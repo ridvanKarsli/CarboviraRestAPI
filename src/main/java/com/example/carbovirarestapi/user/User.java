@@ -17,12 +17,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Sisteme giriş yapabilen kullanıcı. COMPANY_ADMIN/EMPLOYEE rolündeki kullanıcılar tam
- * olarak bir firmaya bağlıdır; PLATFORM_ADMIN rolündeki platform yöneticileri herhangi
- * bir firmanın parçası olmadığından company alanı onlar için null'dır.
- * Not: Bu sınıf bilerek Spring Security'nin UserDetails arayüzünü uygulamaz —
- * güvenlik adaptasyonu security.UserPrincipal içinde ayrıştırılmıştır (SRP,
- * domain modelini framework detaylarından bağımsız tutmak için).
+ * Sisteme giriş yapabilen kullanıcı. COMPANY_ADMIN/EMPLOYEE rolündeki kullanıcılar bir
+ * firmaya bağlıdır; PLATFORM_ADMIN'in bağlı olduğu firma yoktur, company alanı null kalır.
+ * UserDetails arayüzünü bilerek burada değil, security.UserPrincipal içinde uyguluyoruz.
  */
 @Entity
 @Table(name = "users")

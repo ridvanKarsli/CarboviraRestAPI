@@ -11,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-/**
- * JWT üretimi ve doğrulanması ile ilgili tüm sorumluluk burada toplanır.
- * Filter ve controller'lar token'ın nasıl imzalandığını bilmek zorunda kalmaz (SRP).
- */
+/** JWT üretimi ve doğrulaması. */
 @Service
 @RequiredArgsConstructor
 public class JwtService {

@@ -4,10 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 
 /**
- * "Karşı taraf" (counterpart), bu yanıtı alan kullanıcının bakış açısına göre hesaplanır:
- * kullanıcı görüşmeyi başlatansa karşı taraf ilan sahibi firmadır, ilan sahibiyse karşı
- * taraf görüşmeyi başlatan firmadır. Bu yüzden bu dönüşüm MapStruct ile değil, çağıranın
- * kimliğini bilen ConversationServiceImpl içinde elle yapılır.
+ * counterpart alanı çağıranın bakış açısına göre değişir (initiator ise ilan sahibi,
+ * ilan sahibiyse initiator gösterilir) — bu yüzden MapStruct ile değil ConversationServiceImpl'de elle dolduruyoruz.
  */
 @Schema(description = "Görüşme özeti (karşı taraf, çağıran kullanıcının bakış açısına göre gösterilir)")
 public record ConversationResponse(

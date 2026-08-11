@@ -29,12 +29,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-/**
- * AuthServiceImpl'in bağımlılıkları arayüz olduğu için (UserRepository,
- * CompanyRepository, PasswordEncoder, AuthenticationManager, JwtService)
- * gerçek bir Spring context'e veya veritabanına ihtiyaç duymadan, saf
- * Mockito ile hızlıca test edilebiliyor — SOLID'in pratikteki faydası.
- */
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
 

@@ -4,12 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
-/**
- * Sayfalanmış tüm uç noktalar için ortak, kararlı JSON şekli.
- * Spring Data'nın {@link Page}/{@code PageImpl} tipini doğrudan HTTP sınırının dışına
- * sızdırmamak amacıyla kullanılır — böylece API sözleşmesi, Spring Data'nın iç
- * serileştirme davranışındaki değişikliklerden bağımsız kalır.
- */
+/** Sayfalanmış uç noktalar için ortak yanıt şekli; Spring Data'nın Page tipini doğrudan dışa vermiyoruz. */
 @Schema(description = "Sayfalanmış liste yanıtı")
 public record PageResponse<T>(
         @Schema(description = "Bu sayfadaki öğeler")

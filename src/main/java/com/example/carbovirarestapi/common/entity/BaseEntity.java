@@ -12,10 +12,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-/**
- * Tüm entity'lerin ortak alanlarını (id, oluşturulma/güncellenme zamanı) taşır.
- * Tekil sorumluluk: sadece kimlik ve zaman damgası yönetimi (SRP).
- */
+/** Tüm entity'lerin ortak alanları: id, oluşturulma ve güncellenme zamanı. */
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)

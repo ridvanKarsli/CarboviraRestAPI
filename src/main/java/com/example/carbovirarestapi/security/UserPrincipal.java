@@ -9,11 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-/**
- * Spring Security'nin ihtiyaç duyduğu UserDetails sözleşmesi ile domain
- * modelimiz (User) arasındaki uyarlayıcı (adapter). User entity'sinin
- * framework'e bağımlı olmasını engeller (SRP + bağımlılıkların tersine çevrilmesi).
- */
+/** User entity'sini Spring Security'nin UserDetails sözleşmesine uyarlar. */
 @Getter
 public class UserPrincipal implements UserDetails {
 
