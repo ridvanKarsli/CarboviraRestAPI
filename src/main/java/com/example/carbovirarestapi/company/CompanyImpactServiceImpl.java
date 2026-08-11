@@ -75,6 +75,11 @@ public class CompanyImpactServiceImpl implements CompanyImpactService {
     private BigDecimal co2FromBuying(Long companyId, List<Conversation> conversations, Instant from, Instant to) {
         Map<Long, Listing> purchasedListings = new LinkedHashMap<>();
         for (Conversation conversation : conversations) {
+            if (conversation.getInitiatorCompany() == null || conversation.getListing() == null) {
+                // Gerçek akışta hiç olmaması lazım (ikisi de optional=false), yine de testte
+                // görüldüğü gibi boş bir Conversation nesnesiyle çağrılırsa NPE'ye düşmesin.
+                continue;
+            }
             boolean initiatedByMe = conversation.getInitiatorCompany().getId().equals(companyId);
             if (!initiatedByMe || !withinPeriod(conversation.getCreatedAt(), from, to)) {
                 continue;
