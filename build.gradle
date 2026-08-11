@@ -94,6 +94,8 @@ testing {
                 // TestRestTemplate Boot 4'te ayrı bir modüle taşınmış (eski org.springframework.boot.test.web.client
                 // paketi artık yok) — jar'ı ~/.gradle cache'inde grep'leyip bulduk.
                 implementation 'org.springframework.boot:spring-boot-resttestclient'
+                // TestRestTemplateTestAutoConfiguration RestTemplateBuilder'i kullaniyor, o da ayri modulde.
+                implementation 'org.springframework.boot:spring-boot-restclient'
                 implementation 'org.springframework.boot:spring-boot-testcontainers'
                 // io.spring.dependency-management versiyonsuz bağımlılıkları illa kendi BOM'undan
                 // yönetmeye çalışıyor ve testcontainers-bom platform importunu görmezden geliyor —
