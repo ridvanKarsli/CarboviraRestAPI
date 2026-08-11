@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
+import java.util.Map;
 
 /** İlanın tipi (WASTE/RAW_MATERIAL) ve durumu bu uçtan değiştirilemez; durum için ayrı uç kullanılır. */
 @Schema(description = "İlan güncelleme isteği")
@@ -37,6 +38,12 @@ public record ListingUpdateRequest(
 
         @Schema(description = "Opsiyonel fiyat", example = "1500.00")
         @DecimalMin(value = "0.0", message = "Fiyat negatif olamaz")
-        BigDecimal price
+        BigDecimal price,
+
+        @Schema(description = "Malzeme güvenlik bilgi formu / kompozisyon sertifikası linki (opsiyonel)")
+        String specSheetUrl,
+
+        @Schema(description = "Malzemeye özgü ek spesifikasyonlar (opsiyonel); gönderilmezse mevcut değerler korunur")
+        Map<String, String> attributes
 ) {
 }

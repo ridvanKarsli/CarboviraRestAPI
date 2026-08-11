@@ -57,7 +57,8 @@ class CompanyServiceImplTest {
         Company company = Company.builder().name("Eski Ad").taxNumber("111").build();
         when(companyRepository.findById(1L)).thenReturn(Optional.of(company));
 
-        CompanyUpdateRequest request = new CompanyUpdateRequest("Yeni Ad", "Plastik", "Ankara", "Adres", "Açıklama");
+        CompanyUpdateRequest request = new CompanyUpdateRequest(
+                "Yeni Ad", "Plastik", "Ankara", "Adres", "Açıklama", 39.9334, 32.8597);
         CompanyResponse response = companyService.updateCurrentCompany(1L, request);
 
         assertThat(response.name()).isEqualTo("Yeni Ad");

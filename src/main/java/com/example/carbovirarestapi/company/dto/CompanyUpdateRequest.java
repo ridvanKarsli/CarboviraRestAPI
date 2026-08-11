@@ -1,6 +1,8 @@
 package com.example.carbovirarestapi.company.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -23,6 +25,16 @@ public record CompanyUpdateRequest(
 
         @Schema(description = "Firma hakkında serbest metin açıklama", example = "Metal hurda geri dönüşümü konusunda uzman firma.")
         @Size(max = 2000, message = "Açıklama en fazla 2000 karakter olabilir")
-        String description
+        String description,
+
+        @Schema(description = "Enlem (yakınlık aramasında kullanılır, opsiyonel)", example = "40.1885")
+        @DecimalMin(value = "-90.0", message = "Enlem -90 ile 90 arasında olmalı")
+        @DecimalMax(value = "90.0", message = "Enlem -90 ile 90 arasında olmalı")
+        Double latitude,
+
+        @Schema(description = "Boylam (yakınlık aramasında kullanılır, opsiyonel)", example = "29.0610")
+        @DecimalMin(value = "-180.0", message = "Boylam -180 ile 180 arasında olmalı")
+        @DecimalMax(value = "180.0", message = "Boylam -180 ile 180 arasında olmalı")
+        Double longitude
 ) {
 }

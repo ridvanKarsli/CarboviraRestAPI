@@ -1,6 +1,7 @@
 package com.example.carbovirarestapi.company;
 
 import com.example.carbovirarestapi.common.exception.ApiError;
+import com.example.carbovirarestapi.company.dto.CompanyImpactReportResponse;
 import com.example.carbovirarestapi.company.dto.CompanyResponse;
 import com.example.carbovirarestapi.company.dto.CompanyUpdateRequest;
 import com.example.carbovirarestapi.security.UserPrincipal;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CompanyController {
 
     private final CompanyService companyService;
+    private final CompanyImpactService companyImpactService;
 
     @GetMapping("/me")
     @Operation(summary = "Kendi firma profilimi getir", description = "Token sahibi kullanıcının bağlı olduğu firmanın profilini döner.")
@@ -56,6 +58,21 @@ public class CompanyController {
     public CompanyResponse updateCurrentCompany(@AuthenticationPrincipal UserPrincipal principal,
                                                  @Valid @RequestBody CompanyUpdateRequest request) {
         return companyService.updateCurrentCompany(principal.getCompanyId(), request);
+    }
+
+    @GetMapping("/me/impact-report")
+    @Operation(
+            summary = "Kendi firmamın etki raporu",
+            description = "Toplam/aktif/arşiv ilan sayıları, birim bazlı toplam miktar ve toplam görüşme sayısını döner. "
+                    + "Sürdürülebilirlik raporlaması için kaba bir özet, kesin bir CO2 hesabı değil."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Etki raporu"),
+            @ApiResponse(responseCode = "401", description = "Token eksik/geçersiz",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class)))
+    })
+    public CompanyImpactReportResponse getImpactReport(@AuthenticationPrincipal UserPrincipal principal) {
+        return companyImpactService.generate(principal.getCompanyId());
     }
 
     @GetMapping("/{id}")

@@ -14,9 +14,12 @@ public interface ListingMapper {
     ListingResponse toResponse(Listing listing);
 
     // type, status ve company bu uçtan bilerek güncellenmez: type sabittir, status ve
-    // company için ayrı iş kuralları (ListingService) uygulanır.
+    // company için ayrı iş kuralları (ListingService) uygulanır. attributes de ignore —
+    // request'te gönderilmezse null gelip mevcut spesifikasyonları silmesin diye, elle
+    // yönetimi ListingServiceImpl.update()'te yapıyoruz.
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "company", ignore = true)
+    @Mapping(target = "attributes", ignore = true)
     void updateEntity(ListingUpdateRequest request, @MappingTarget Listing listing);
 }

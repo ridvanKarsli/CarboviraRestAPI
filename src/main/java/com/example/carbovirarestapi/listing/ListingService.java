@@ -16,6 +16,10 @@ public interface ListingService {
     /** Sadece ACTIVE ilanlar arasında, verilen (opsiyonel) filtrelerle arama yapar. */
     Page<ListingResponse> search(ListingType type, String category, String city, String keyword, Pageable pageable);
 
+    /** Çağıran firmanın konumuna göre belirtilen yarıçap (km) içindeki ACTIVE ilanları, en yakından
+     *  en uzağa sıralı döner. Çağıran firmanın profilinde konum (latitude/longitude) girilmiş olmalı. */
+    Page<ListingResponse> searchNearby(Long callerCompanyId, double radiusKm, Pageable pageable);
+
     /** Çağıran firmanın durumu ne olursa olsun tüm kendi ilanları. */
     Page<ListingResponse> getMine(Long companyId, Pageable pageable);
 

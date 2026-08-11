@@ -1,13 +1,19 @@
 package com.example.carbovirarestapi.listing;
 
+import com.example.carbovirarestapi.common.GeoUtils;
+import com.example.carbovirarestapi.common.exception.BusinessRuleViolationException;
 import com.example.carbovirarestapi.common.exception.ResourceNotFoundException;
 import com.example.carbovirarestapi.company.Company;
 import com.example.carbovirarestapi.company.CompanyRepository;
 import com.example.carbovirarestapi.listing.dto.ListingCreateRequest;
 import com.example.carbovirarestapi.listing.dto.ListingResponse;
 import com.example.carbovirarestapi.listing.dto.ListingUpdateRequest;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -38,6 +44,8 @@ public class ListingServiceImpl implements ListingService {
                 .unit(request.unit())
                 .city(request.city())
                 .price(request.price())
+                .specSheetUrl(request.specSheetUrl())
+                .attributes(request.attributes() != null ? request.attributes() : new HashMap<>())
                 .status(ListingStatus.ACTIVE)
                 .company(company)
                 .build();
@@ -63,10 +71,45 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
+    public Page<ListingResponse> searchNearby(Long callerCompanyId, double radiusKm, Pageable pageable) {
+        Company caller = companyRepository.findById(callerCompanyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Firma bulunamadı: id=" + callerCompanyId));
+        if (caller.getLatitude() == null || caller.getLongitude() == null) {
+            throw new BusinessRuleViolationException(
+                    "Yakınlık aramasını kullanabilmek için önce firma profilinize konum bilgisi eklemelisiniz.");
+        }
+
+        // PostGIS gibi coğrafi bir index yok, aday listeyi çekip mesafeyi burada hesaplayıp
+        // sıralıyoruz. İlan sayısı ciddi büyürse bu gerçekten veritabanı seviyesine taşınmalı.
+        List<ListingWithDistance> withDistance = listingRepository.findActiveWithCompanyLocation(ListingStatus.ACTIVE)
+                .stream()
+                .map(listing -> new ListingWithDistance(listing, GeoUtils.distanceKm(
+                        caller.getLatitude(), caller.getLongitude(),
+                        listing.getCompany().getLatitude(), listing.getCompany().getLongitude())))
+                .filter(entry -> entry.distanceKm() <= radiusKm)
+                .sorted(Comparator.comparingDouble(ListingWithDistance::distanceKm))
+                .toList();
+
+        int start = (int) pageable.getOffset();
+        if (start >= withDistance.size()) {
+            return new PageImpl<>(List.of(), pageable, withDistance.size());
+        }
+        int end = Math.min(start + pageable.getPageSize(), withDistance.size());
+        List<ListingResponse> pageContent = withDistance.subList(start, end).stream()
+                .map(entry -> listingMapper.toResponse(entry.listing()))
+                .toList();
+
+        return new PageImpl<>(pageContent, pageable, withDistance.size());
+    }
+
+    @Override
     @Transactional
     public ListingResponse update(Long companyId, Long listingId, ListingUpdateRequest request) {
         Listing listing = findOwnedListingOrThrow(companyId, listingId);
         listingMapper.updateEntity(request, listing);
+        if (request.attributes() != null) {
+            listing.setAttributes(request.attributes());
+        }
         return listingMapper.toResponse(listing);
     }
 
@@ -96,5 +139,8 @@ public class ListingServiceImpl implements ListingService {
             throw new AccessDeniedException("Bu ilan üzerinde işlem yapma yetkiniz yok.");
         }
         return listing;
+    }
+
+    private record ListingWithDistance(Listing listing, double distanceKm) {
     }
 }

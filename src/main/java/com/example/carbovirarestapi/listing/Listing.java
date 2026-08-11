@@ -2,15 +2,20 @@ package com.example.carbovirarestapi.listing;
 
 import com.example.carbovirarestapi.common.entity.BaseEntity;
 import com.example.carbovirarestapi.company.Company;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,6 +56,20 @@ public class Listing extends BaseEntity {
 
     @Column(precision = 19, scale = 2)
     private BigDecimal price;
+
+    // Malzeme güvenlik bilgi formu / kompozisyon sertifikası gibi bir belgeye link; gerçek dosya
+    // yükleme yapmıyoruz, alıcı tarafın malzemeyi görmeden değerlendirebilmesi için basit bir çözüm.
+    @Column(name = "spec_sheet_url", length = 500)
+    private String specSheetUrl;
+
+    // Malzeme tipine göre değişen ek spesifikasyonlar (nem oranı, saflık yüzdesi, parçacık boyutu vs.)
+    // sabit kolonlar yerine key-value olarak tutuluyor, çünkü her malzeme tipinin alanları farklı.
+    @ElementCollection
+    @CollectionTable(name = "listing_attributes", joinColumns = @JoinColumn(name = "listing_id"))
+    @MapKeyColumn(name = "attribute_key", length = 100)
+    @Column(name = "attribute_value", length = 500)
+    @Builder.Default
+    private Map<String, String> attributes = new HashMap<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

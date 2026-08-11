@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Schema(description = "Yeni atık/hammadde ilanı oluşturma isteği")
 public record ListingCreateRequest(
@@ -41,6 +42,13 @@ public record ListingCreateRequest(
 
         @Schema(description = "Opsiyonel fiyat; belirtilmezse ücretsiz/pazarlığa açık kabul edilir", example = "1500.00")
         @DecimalMin(value = "0.0", message = "Fiyat negatif olamaz")
-        BigDecimal price
+        BigDecimal price,
+
+        @Schema(description = "Malzeme güvenlik bilgi formu / kompozisyon sertifikası linki (opsiyonel)",
+                example = "https://example.com/sds/pet-plastik.pdf")
+        String specSheetUrl,
+
+        @Schema(description = "Malzemeye özgü ek spesifikasyonlar (opsiyonel), örn. nem oranı, saflık yüzdesi")
+        Map<String, String> attributes
 ) {
 }

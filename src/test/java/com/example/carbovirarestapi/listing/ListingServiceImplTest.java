@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.example.carbovirarestapi.common.exception.BusinessRuleViolationException;
 import com.example.carbovirarestapi.common.exception.ResourceNotFoundException;
 import com.example.carbovirarestapi.company.Company;
 import com.example.carbovirarestapi.company.CompanyRepository;
@@ -13,6 +14,7 @@ import com.example.carbovirarestapi.listing.dto.ListingCreateRequest;
 import com.example.carbovirarestapi.listing.dto.ListingResponse;
 import com.example.carbovirarestapi.listing.dto.ListingUpdateRequest;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,7 +52,7 @@ class ListingServiceImplTest {
 
         ListingCreateRequest request = new ListingCreateRequest(
                 ListingType.WASTE, "500 kg PET", "Plastik", "Temiz PET atığı",
-                BigDecimal.valueOf(500), "kg", "İstanbul", null);
+                BigDecimal.valueOf(500), "kg", "İstanbul", null, null, null);
 
         ListingResponse response = listingService.create(OWNER_COMPANY_ID, request);
 
@@ -72,7 +76,8 @@ class ListingServiceImplTest {
         when(listingRepository.findById(10L)).thenReturn(Optional.of(listing));
 
         ListingUpdateRequest request = new ListingUpdateRequest(
-                "Yeni başlık", "Metal", "Güncel açıklama", BigDecimal.TEN, "ton", "Ankara", BigDecimal.valueOf(100));
+                "Yeni başlık", "Metal", "Güncel açıklama", BigDecimal.TEN, "ton", "Ankara", BigDecimal.valueOf(100),
+                null, null);
 
         ListingResponse response = listingService.update(OWNER_COMPANY_ID, 10L, request);
 
@@ -89,7 +94,7 @@ class ListingServiceImplTest {
         when(listingRepository.findById(10L)).thenReturn(Optional.of(listing));
 
         ListingUpdateRequest request = new ListingUpdateRequest(
-                "Başlık", "Metal", "Açıklama", BigDecimal.TEN, "ton", "Ankara", null);
+                "Başlık", "Metal", "Açıklama", BigDecimal.TEN, "ton", "Ankara", null, null, null);
 
         assertThatThrownBy(() -> listingService.update(OTHER_COMPANY_ID, 10L, request))
                 .isInstanceOf(AccessDeniedException.class);
@@ -121,6 +126,56 @@ class ListingServiceImplTest {
 
         assertThatThrownBy(() -> listingService.delete(OTHER_COMPANY_ID, 10L))
                 .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void searchNearby_throwsBusinessRuleViolationException_whenCallerHasNoLocation() {
+        Company caller = companyWithId(OWNER_COMPANY_ID);
+        when(companyRepository.findById(OWNER_COMPANY_ID)).thenReturn(Optional.of(caller));
+
+        assertThatThrownBy(() -> listingService.searchNearby(OWNER_COMPANY_ID, 50, PageRequest.of(0, 20)))
+                .isInstanceOf(BusinessRuleViolationException.class);
+    }
+
+    @Test
+    void searchNearby_filtersByRadiusAndSortsByDistance() {
+        // İstanbul'da bir çağıran; biri hemen yanında (Kadıköy), biri çok uzakta (Ankara) iki ilan.
+        Company caller = companyWithId(OWNER_COMPANY_ID);
+        caller.setLatitude(41.0082);
+        caller.setLongitude(28.9784);
+        when(companyRepository.findById(OWNER_COMPANY_ID)).thenReturn(Optional.of(caller));
+
+        Company nearCompany = companyWithId(2L);
+        nearCompany.setLatitude(40.9909);
+        nearCompany.setLongitude(29.0304);
+        Listing nearListing = activeListingOwnedBy(nearCompany, "Yakın ilan");
+
+        Company farCompany = companyWithId(3L);
+        farCompany.setLatitude(39.9334);
+        farCompany.setLongitude(32.8597);
+        Listing farListing = activeListingOwnedBy(farCompany, "Uzak ilan");
+
+        when(listingRepository.findActiveWithCompanyLocation(ListingStatus.ACTIVE))
+                .thenReturn(List.of(farListing, nearListing));
+
+        Page<ListingResponse> result = listingService.searchNearby(OWNER_COMPANY_ID, 50, PageRequest.of(0, 20));
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).title()).isEqualTo("Yakın ilan");
+    }
+
+    private Listing activeListingOwnedBy(Company company, String title) {
+        return Listing.builder()
+                .type(ListingType.WASTE)
+                .title(title)
+                .category("Plastik")
+                .description("Açıklama")
+                .quantity(BigDecimal.valueOf(100))
+                .unit("kg")
+                .city("İstanbul")
+                .status(ListingStatus.ACTIVE)
+                .company(company)
+                .build();
     }
 
     private Listing activeListingOwnedBy(Long companyId) {

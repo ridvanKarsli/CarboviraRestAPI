@@ -78,6 +78,23 @@ public class ListingController {
         return PageResponse.from(listingService.getMine(principal.getCompanyId(), pageable));
     }
 
+    @GetMapping("/nearby")
+    @Operation(
+            summary = "Yakındaki ilanlar",
+            description = "Çağıran firmanın konumuna göre belirtilen yarıçap (km) içindeki ACTIVE ilanları "
+                    + "en yakından en uzağa sıralar. Firma profilinde konum bilgisi (latitude/longitude) girilmiş olmalı."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "İlan listesi, en yakından en uzağa"),
+            @ApiResponse(responseCode = "400", description = "Çağıran firmanın profilinde konum bilgisi yok",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ApiError.class)))
+    })
+    public PageResponse<ListingResponse> searchNearby(@AuthenticationPrincipal UserPrincipal principal,
+                                                        @Parameter(description = "Arama yarıçapı (km)", example = "50") @RequestParam double radiusKm,
+                                                        @PageableDefault(size = 20) Pageable pageable) {
+        return PageResponse.from(listingService.searchNearby(principal.getCompanyId(), radiusKm, pageable));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "İlan detayı")
     @ApiResponses({

@@ -38,4 +38,10 @@ public class Company extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean verified = false;
+
+    // Yakınlık aramasında kullanılıyor (bkz. ListingServiceImpl.searchNearby). İkisi de opsiyonel,
+    // firma profilinde konum girilmemişse o firma bu aramaya hiç dahil olmuyor.
+    private Double latitude;
+
+    private Double longitude;
 }

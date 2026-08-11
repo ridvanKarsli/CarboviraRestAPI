@@ -5,6 +5,7 @@ import com.example.carbovirarestapi.listing.ListingType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Map;
 
 @Schema(description = "İlan görünümü")
 public record ListingResponse(
@@ -44,6 +45,12 @@ public record ListingResponse(
 
         @Schema(description = "İlan sahibi firmanın adı", example = "Acme Geri Dönüşüm A.Ş.")
         String companyName,
+
+        @Schema(description = "Malzeme güvenlik bilgi formu / kompozisyon sertifikası linki (varsa)")
+        String specSheetUrl,
+
+        @Schema(description = "Malzemeye özgü ek spesifikasyonlar")
+        Map<String, String> attributes,
 
         @Schema(description = "Oluşturulma tarihi")
         Instant createdAt

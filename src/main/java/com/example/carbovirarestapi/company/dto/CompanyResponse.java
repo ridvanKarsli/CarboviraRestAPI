@@ -31,6 +31,12 @@ public record CompanyResponse(
         @Schema(description = "Platform yönetimi tarafından onaylanmış mı")
         boolean verified,
 
+        @Schema(description = "Enlem (girilmişse)", example = "40.1885")
+        Double latitude,
+
+        @Schema(description = "Boylam (girilmişse)", example = "29.0610")
+        Double longitude,
+
         @Schema(description = "Kayıt tarihi")
         Instant createdAt
 ) {

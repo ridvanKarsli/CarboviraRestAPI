@@ -5,7 +5,9 @@ import com.example.carbovirarestapi.auth.dto.LoginRequest;
 import com.example.carbovirarestapi.auth.dto.RegisterRequest;
 import com.example.carbovirarestapi.common.dto.PageResponse;
 import com.example.carbovirarestapi.common.exception.ApiError;
+import com.example.carbovirarestapi.company.dto.CompanyImpactReportResponse;
 import com.example.carbovirarestapi.company.dto.CompanyResponse;
+import com.example.carbovirarestapi.company.dto.CompanyUpdateRequest;
 import com.example.carbovirarestapi.listing.ListingStatus;
 import com.example.carbovirarestapi.listing.ListingType;
 import com.example.carbovirarestapi.listing.dto.ListingCreateRequest;
@@ -16,6 +18,7 @@ import com.example.carbovirarestapi.messaging.dto.ConversationStartRequest;
 import com.example.carbovirarestapi.messaging.dto.MessageResponse;
 import com.example.carbovirarestapi.messaging.dto.MessageSendRequest;
 import java.math.BigDecimal;
+import java.util.Map;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -117,7 +120,8 @@ class CarboviraApiE2ETest {
     void sellerCanCreateListing() {
         ListingCreateRequest request = new ListingCreateRequest(
                 ListingType.WASTE, "500 kg PET plastik atığı", "Plastik",
-                "Temiz, tek tip PET şişe atığı", BigDecimal.valueOf(500), "kg", "İstanbul", null);
+                "Temiz, tek tip PET şişe atığı", BigDecimal.valueOf(500), "kg", "İstanbul", null,
+                "https://example.com/sds/pet-plastik.pdf", Map.of("nem_orani", "%2"));
 
         ResponseEntity<ListingResponse> response = restTemplate.exchange(
                 "/api/listings", HttpMethod.POST, authedEntity(sellerToken, request), ListingResponse.class);
@@ -268,6 +272,46 @@ class CarboviraApiE2ETest {
                 "/api/admin/companies", HttpMethod.GET, authedEntity(sellerToken, null), ApiError.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @Order(16)
+    void sellerSetsLocationAndFindsNearbyListing() {
+        // Önce firma profiline konum ekliyoruz (İstanbul), yakınlık araması bu olmadan çalışmıyor.
+        CompanyUpdateRequest updateRequest = new CompanyUpdateRequest(
+                "Acme Geri Dönüşüm", "Metal", "İstanbul", "OSB 5. Cadde No:1", "Açıklama", 41.0082, 28.9784);
+        ResponseEntity<CompanyResponse> updateResponse = restTemplate.exchange(
+                "/api/companies/me", HttpMethod.PUT, authedEntity(sellerToken, updateRequest), CompanyResponse.class);
+        assertThat(updateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // İlk ilanı test 11'de arşivlemiştik, yakınlık araması için yeni bir ACTIVE ilan açıyoruz.
+        ListingCreateRequest listingRequest = new ListingCreateRequest(
+                ListingType.WASTE, "2 ton karton atığı", "Kağıt/Karton", "Temiz karton atığı",
+                BigDecimal.valueOf(2), "ton", "İstanbul", null, null, Map.of());
+        ResponseEntity<ListingResponse> listingResponse = restTemplate.exchange(
+                "/api/listings", HttpMethod.POST, authedEntity(sellerToken, listingRequest), ListingResponse.class);
+        assertThat(listingResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        Long nearbyListingId = listingResponse.getBody().id();
+
+        ResponseEntity<PageResponse<ListingResponse>> nearbyResponse = restTemplate.exchange(
+                "/api/listings/nearby?radiusKm=10", HttpMethod.GET, authedEntity(sellerToken, null),
+                new ParameterizedTypeReference<>() {});
+
+        assertThat(nearbyResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(nearbyResponse.getBody().content()).extracting(ListingResponse::id).contains(nearbyListingId);
+    }
+
+    @Test
+    @Order(17)
+    void impactReportReflectsSellerActivity() {
+        ResponseEntity<CompanyImpactReportResponse> response = restTemplate.exchange(
+                "/api/companies/me/impact-report", HttpMethod.GET, authedEntity(sellerToken, null),
+                CompanyImpactReportResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        // O ana kadar seller iki ilan açmıştı (biri arşivlenmiş, biri aktif) ve bir görüşmeye taraftı.
+        assertThat(response.getBody().totalListings()).isGreaterThanOrEqualTo(2);
+        assertThat(response.getBody().totalConversations()).isGreaterThanOrEqualTo(1);
     }
 
     private HttpEntity<Object> authedEntity(String token, Object body) {
