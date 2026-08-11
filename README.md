@@ -1,5 +1,7 @@
 # Carbovira — Endüstriyel Simbiyoz Platformu
 
+![CI](https://github.com/ridvanKarsli/CarboviraRestAPI/actions/workflows/ci.yml/badge.svg)
+
 Firmaların atıklarını başka bir firmanın hammaddesi olarak ilan edebildiği, arayabildiği ve
 platform üzerinden iletişime geçebildiği bir REST API.
 
@@ -70,7 +72,8 @@ com.example.carbovirarestapi
 ```
 
 Postgres/Docker gerekmiyor, `test` profili bellek içi H2 kullanıyor
-(`src/test/resources/application-test.properties`).
+(`src/test/resources/application-test.properties`). Aynı build main'e her push/PR'da
+GitHub Actions'ta da çalışıyor (`.github/workflows/ci.yml`).
 
 ## API
 
