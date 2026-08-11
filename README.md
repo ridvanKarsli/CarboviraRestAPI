@@ -40,7 +40,8 @@ com.example.carbovirarestapi
 ├── company    # Company entity, DTO, Mapper, Service, Controller
 ├── auth       # Kayıt/giriş DTO'ları, AuthService, AuthController
 ├── listing    # Listing entity, Specification, DTO, Mapper, Service, Controller
-└── messaging  # Conversation/Message entity, DTO, Mapper, Service, Controller
+├── messaging  # Conversation/Message entity, DTO, Mapper, Service, Controller
+└── admin      # Firma onay akışı (PLATFORM_ADMIN), ilk admin bootstrap'i
 ```
 
 ## Yerel Geliştirme
@@ -63,6 +64,7 @@ com.example.carbovirarestapi
 | `DB_USERNAME` / `DB_PASSWORD` | `carbovira` / `carbovira` | docker-compose.yml ile aynı |
 | `JWT_SECRET` | (dev varsayılanı) | **Production'da mutlaka değiştirilmeli**, en az 256 bit |
 | `JWT_EXPIRATION_MS` | `86400000` (24 saat) | Token geçerlilik süresi |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | (boş) | İkisi de doluysa ve bu e-postayla kullanıcı yoksa, uygulama açılışında ilk PLATFORM_ADMIN otomatik oluşturulur |
 
 ### Testler
 
@@ -109,11 +111,26 @@ Testler gerçek bir Postgres/Docker gerektirmez; `test` profili bellek içi H2 k
 Kendi ilanınıza mesaj gönderemezsiniz (`400`). Aynı firma aynı ilan için ikinci bir görüşme açamaz;
 tekrar mesaj gönderildiğinde mevcut görüşmeye eklenir. Taraf olmadığınız bir görüşmeye erişim `403` döner.
 
+### Faz 4 — Admin (Firma Onayı)
+
+| Metot | Yol | Açıklama | Yetki |
+|---|---|---|---|
+| GET | `/api/admin/companies` | Firmaları listele (`verified` filtresiyle, ops.) | PLATFORM_ADMIN |
+| PATCH | `/api/admin/companies/{id}/verify` | Firmayı onayla | PLATFORM_ADMIN |
+
+Onay şu an için **sadece bilgilendirici bir rozet**: onaylanmamış firmalar da ilan verip mesajlaşabilir,
+`verified=false` sadece `CompanyResponse` üzerinden görünür. İleride zorunlu hale getirilmek istenirse
+`ListingService.create()` içine tek bir kontrol eklemek yeterlidir.
+
+İlk platform yöneticisi, register uç noktasından oluşturulamaz (register her zaman COMPANY_ADMIN üretir).
+`ADMIN_EMAIL`/`ADMIN_PASSWORD` ortam değişkenleri tanımlıysa uygulama açılışında otomatik oluşturulur
+(bkz. `admin.AdminBootstrapRunner`).
+
 Tüm istekler (auth uçları hariç) `Authorization: Bearer <token>` başlığı bekler. Başka bir firmanın
 ilanında güncelleme/silme denemesi `403 Forbidden` ile sonuçlanır.
 
 ## Yol Haritası
 
-Faz 1 (Auth & Company), Faz 2 (Listing) ve Faz 3 (Messaging) tamamlandı. Sonraki olası adımlar: admin
-onay akışı, bildirimler, ilan/firma için dosya-görsel yükleme — proje raporunda (`Carbovira_Proje_Raporu.docx`)
-detaylandırılmıştır.
+Faz 1 (Auth & Company), Faz 2 (Listing), Faz 3 (Messaging) ve Faz 4 (Admin onayı) tamamlandı. Sonraki
+olası adımlar: bildirimler, ilan/firma için dosya-görsel yükleme, ilan onayı zorunlu hale getirme —
+proje raporunda (`Carbovira_Proje_Raporu.docx`) detaylandırılmıştır.

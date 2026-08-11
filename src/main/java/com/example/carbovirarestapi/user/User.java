@@ -17,7 +17,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Sisteme giriş yapabilen kullanıcı. Her kullanıcı tam olarak bir firmaya bağlıdır.
+ * Sisteme giriş yapabilen kullanıcı. COMPANY_ADMIN/EMPLOYEE rolündeki kullanıcılar tam
+ * olarak bir firmaya bağlıdır; PLATFORM_ADMIN rolündeki platform yöneticileri herhangi
+ * bir firmanın parçası olmadığından company alanı onlar için null'dır.
  * Not: Bu sınıf bilerek Spring Security'nin UserDetails arayüzünü uygulamaz —
  * güvenlik adaptasyonu security.UserPrincipal içinde ayrıştırılmıştır (SRP,
  * domain modelini framework detaylarından bağımsız tutmak için).
@@ -48,7 +50,8 @@ public class User extends BaseEntity {
     @Builder.Default
     private boolean enabled = true;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "company_id", nullable = false)
+    /** PLATFORM_ADMIN dışındaki tüm roller için zorunludur; PLATFORM_ADMIN için null. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
     private Company company;
 }

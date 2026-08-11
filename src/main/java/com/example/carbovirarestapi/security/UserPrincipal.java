@@ -34,12 +34,14 @@ public class UserPrincipal implements UserDetails {
     }
 
     public static UserPrincipal from(User user) {
+        // PLATFORM_ADMIN kullanıcılarının bağlı olduğu bir firma yoktur.
+        Long companyId = user.getCompany() != null ? user.getCompany().getId() : null;
         return new UserPrincipal(
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getRole(),
-                user.getCompany().getId(),
+                companyId,
                 user.isEnabled()
         );
     }

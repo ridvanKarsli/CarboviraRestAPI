@@ -63,6 +63,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        // URL seviyesinde kaba (coarse) kontrol; ince taneli (fine-grained) kontrol
+                        // controller'lardaki @PreAuthorize ile yapılır (savunmada derinlik).
+                        .requestMatchers("/api/admin/**").hasRole("PLATFORM_ADMIN")
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider)
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint))
