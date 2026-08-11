@@ -36,7 +36,10 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.2'
 
     // Şema versiyonlama (Flyway) — ddl-auto yerine kontrollü migration
-    implementation 'org.flywaydb:flyway-core'
+    // Boot 4'te flyway-core tek başına yetmiyor, autoconfiguration ayrı modüle (spring-boot-flyway)
+    // taşınmış; onu getiren asıl bağımlılık spring-boot-starter-flyway. Gerçek Postgres'e karşı
+    // e2e testi ekleyene kadar bu eksiklik hiç fark edilmemiş — H2 profili Flyway'i zaten atlıyordu.
+    implementation 'org.springframework.boot:spring-boot-starter-flyway'
     implementation 'org.flywaydb:flyway-database-postgresql'
 
     // JWT
