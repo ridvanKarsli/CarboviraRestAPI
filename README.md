@@ -76,7 +76,7 @@ raporu. Ayrıntı için `frontend/README.md`.
    ```bash
    ./gradlew bootRun
    ```
-3. Swagger: http://localhost:8080/swagger-ui.html
+3. Swagger: http://localhost:8081/swagger-ui.html
 4. Frontend'i (opsiyonel, ayrı terminalde) çalıştır:
    ```bash
    cd frontend
@@ -86,11 +86,16 @@ raporu. Ayrıntı için `frontend/README.md`.
    http://localhost:5173'te açılır. Backend'de `app.cors.allowed-origins` bu adresi zaten
    izin veriyor.
 
+Varsayılan portlar (8081/5433) standart 8080/5432 değil — kendi makinemde başka bir
+projenin container'ları o portları zaten tutuyordu, çatışmayı yaşayınca varsayılanı
+değiştirdim. `SERVER_PORT`/`DB_URL` ile istediğin gibi geri alabilirsin.
+
 ### Ortam Değişkenleri
 
 | Değişken | Varsayılan | Açıklama |
 |---|---|---|
-| `DB_URL` | `jdbc:postgresql://localhost:5432/carbovira` | Veritabanı bağlantısı |
+| `SERVER_PORT` | `8081` | uygulamanın dinlediği port |
+| `DB_URL` | `jdbc:postgresql://localhost:5433/carbovira` | Veritabanı bağlantısı |
 | `DB_USERNAME` / `DB_PASSWORD` | `carbovira` / `carbovira` | docker-compose.yml ile aynı |
 | `JWT_SECRET` | (dev varsayılanı) | production'da mutlaka değiştir, en az 256 bit |
 | `JWT_EXPIRATION_MS` | `86400000` (24 saat) | token geçerlilik süresi |
@@ -122,7 +127,7 @@ sonra ayrı bir adımda otomatik çalışıyor, GitHub'ın runner'larında Docke
 ## API
 
 Aşağıdakilerin hepsi `Authorization: Bearer <token>` ister, tek istisna `/api/auth/**`.
-Detaylı örnekler için Swagger daha rahat: http://localhost:8080/swagger-ui.html
+Detaylı örnekler için Swagger daha rahat: http://localhost:8081/swagger-ui.html
 
 Auth & Company:
 - `POST /api/auth/register` — firma + ilk kullanıcıyı (COMPANY_ADMIN) birlikte oluşturur, herkese açık

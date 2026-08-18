@@ -5,7 +5,7 @@ ilan verme, mesajlaşma, firma profili ve etki/karbon raporu.
 
 ## Çalıştırma
 
-Backend'in ayrı bir terminalde `8080` portunda çalışıyor olması gerekiyor
+Backend'in ayrı bir terminalde `8081` portunda çalışıyor olması gerekiyor
 (`../gradlew bootRun`).
 
 ```bash
@@ -13,7 +13,7 @@ npm install
 npm run dev
 ```
 
-Varsayılan olarak `http://localhost:5173`'te açılır ve `http://localhost:8080`'e istek
+Varsayılan olarak `http://localhost:5173`'te açılır ve `http://localhost:8081`'e istek
 yapar. Farklı bir backend adresi kullanmak istersen `.env.example`'ı `.env.local` olarak
 kopyalayıp `VITE_API_BASE_URL`'i değiştir.
 

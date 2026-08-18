@@ -7,7 +7,9 @@ services:
       POSTGRES_USER: carbovira
       POSTGRES_PASSWORD: carbovira
     ports:
-      - "5432:5432"
+      # 5432 bu makinede başka bir projenin (blog-postgres) container'ı tarafından tutulu,
+      # o yüzden host tarafında 5433 kullanıyoruz; container içi hâlâ standart 5432.
+      - "5433:5432"
     volumes:
       - carbovira-data:/var/lib/postgresql/data
     healthcheck:
