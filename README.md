@@ -62,17 +62,29 @@ com.example.carbovirarestapi
 └── admin      # Firma onay akışı (PLATFORM_ADMIN), ilk admin bootstrap'i
 ```
 
+`frontend/` klasörü ayrı bir React (Vite) uygulaması, backend'i tüketen gerçek bir
+kullanıcı arayüzü — kayıt/giriş, ilan arama/verme, mesajlaşma, firma profili, etki/karbon
+raporu. Ayrıntı için `frontend/README.md`.
+
 ## Yerel Geliştirme
 
 1. Postgres'i ayağa kaldır:
    ```bash
    docker compose up -d
    ```
-2. Çalıştır:
+2. Backend'i çalıştır:
    ```bash
    ./gradlew bootRun
    ```
 3. Swagger: http://localhost:8080/swagger-ui.html
+4. Frontend'i (opsiyonel, ayrı terminalde) çalıştır:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   http://localhost:5173'te açılır. Backend'de `app.cors.allowed-origins` bu adresi zaten
+   izin veriyor.
 
 ### Ortam Değişkenleri
 
