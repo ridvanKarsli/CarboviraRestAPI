@@ -1,7 +1,9 @@
 package com.example.carbovirarestapi.security;
 
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +29,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * Uygulamanın tüm güvenlik kurallarının tek toplandığı yer: stateless JWT
  * kimlik doğrulaması, herkese açık uçlar ve şifreleme stratejisi.
  */
+@Slf4j
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
@@ -58,8 +61,18 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList();
+        // "Invalid CORS request" hatasını debug ederken origin listesinin gerçekten doğru
+        // resolve olup olmadığından şüphelendim, kalıcı olarak loglamaya karar verdim.
+        log.info("CORS izin verilen origin'ler: {}", origins);
+
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
+        // setAllowedOrigins yerine allowedOriginPatterns kullanıyoruz; allowCredentials(true) ile
+        // birlikte daha esnek/güvenilir eşleşiyor (ör. sonda / farkı gibi durumlarda takılmıyor).
+        configuration.setAllowedOriginPatterns(origins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
